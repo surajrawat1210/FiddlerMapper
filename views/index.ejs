@@ -1,0 +1,77 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Force-Directed Graph</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/json-viewer-js/dist/json-viewer.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/index.css">
+</head>
+<body>
+
+    <!-- Bootstrap Navbar -->
+    <div class="navbar">
+        <a class="navbar-brand" href="#">Fiddler Call Mapper</a>
+        
+        <div class="search-container">
+          <form >
+            <input type="text" id ="call-name" placeholder="Search Url ...">
+            <button type="button" id="callButton" type="submit" value="submit">Search</button>
+          </form>
+        </div>
+      </div>
+          <div class="container-fluid">
+        <div class="row no-gutters">
+            <!-- Graph column (8 columns) -->
+            <div class="col-md-8">
+                <svg id="graph"></svg>
+            </div>
+            <!-- Additional data column (4 columns) -->
+            <div class="col-md-4">
+                <div id="additionalData">
+                    <!-- Your additional data content goes here -->
+                
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="sidebar" id="sidebar">
+                    <h2>Edge Details</h2>
+                    <table id="edgeDetails">
+                      <thead>
+                        <tr>
+                          <th>Source</th>
+                          <th>Destination</th>
+                          <th>Weight</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                      </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="tooltip"></div>
+    <div id="myData" style="display: none;"> <%= JSON.stringify(data) %> </div>
+    
+    <!-- Bootstrap JS, D3.js, and Custom JS -->
+    <!-- Adjust as needed -->
+    <!-- <script src="https://unpkg.com/json-viewer-js/dist/json-viewer.js"></script> -->
+    <script src="node_modules/json-viewer/index.js"></script>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="/index.js"></script>
+</body>
+</html>

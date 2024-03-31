@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Call Mapper</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .container {
+      margin-top: 50px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-8">
+        <h1>Call Mapper</h1>
+        <form id="jsonForm" method="post" action="/add">
+          <div class="form-group" >
+            <label for="jsonInput">Enter JSON Data:</label>
+            <textarea class="form-control" id="jsonInput" rows="40" name="data" required></textarea>
+          </div>
+          <button type="button" class="btn btn-primary" onclick="validateJSON()">Validate JSON</button>
+          <button type="submit" class="btn btn-success" id="submitButton" style="display: none;">Submit JSON</button>
+        </form>
+        <div id="validationResult"></div>
+      </div>
+    </div>
+  </div>
+
+<script>
+function validateJSON() {
+      const jsonInput = document.getElementById('jsonInput').value;
+      try {
+        JSON.parse(jsonInput);
+        document.getElementById('validationResult').innerText = 'Valid JSON';
+        document.getElementById('submitButton').style.display = 'block';
+      } catch (error) {
+        document.getElementById('validationResult').innerText = 'Invalid JSON: ' + error.message;
+        document.getElementById('submitButton').style.display = 'none';
+      }
+    }
+</script>
+</body>
+</html>
