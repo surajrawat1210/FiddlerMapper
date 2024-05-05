@@ -1,10 +1,12 @@
 const IgnoreUrls = [".png",".jpg",".css",".js",".gif"];
-var CallListMap ={};
+var CallListMap =[];
+
 export const  processNetworkData = (data) =>{
     // Your conversion logic here
     data = JSON.parse(data);
+    var entries = data.log.entries.sort((a, b) => a._publicFiddlerId - b._publicFiddlerId);
     
-    const convertedData = data.log.entries.map(entry => {
+    const convertedData = entries.map(entry => {
         console.log("hello");
         if(isUrlValid(entry.request.url))
         {
@@ -20,15 +22,19 @@ export const  processNetworkData = (data) =>{
         {
             CallListMap[entry.request.url]=1;
         }
+        if(entry.request.url.includes("https://www.paypal.com/auth/validatecaptcha"))
+        {
+            console.log("ehl");
+        }
         return {
             "url": entry.request.url,
             "callNumber":callNumber,
             "requestHeader": convertHeadersToLowercase(entry.request.headers),
             "responseHeader": convertHeadersToLowercase(entry.response.headers),
             "request": {
-                "query": entry.request.queryString,
-                "body": entry.request.postData ? entry.request.postData.text : null,
-                "contentType": entry.request.postData ? entry.request.postData.mimeType : null,
+                "query": entry.request?.queryString,
+                "body": entry?.request?.postData?.text ? entry.request?.postData?.text : entry.request?.postData?.params,
+                "contentType": entry?.request?.postData ? entry?.request?.postData?.mimeType : null,
                 "httpVersion": entry.request.httpVersion
             },
             "response": {
@@ -37,7 +43,9 @@ export const  processNetworkData = (data) =>{
                 "contentType": entry.response.content ? entry.response.content.mimeType : null
             },
             "RequestCookie": entry.request.cookies,
-            "ResponseCookie": entry.response.cookies
+            "ResponseCookie": entry.response.cookies,
+            "ResponseTime":entry.time??0,
+            "message":"success"
         };
     }  
     else {

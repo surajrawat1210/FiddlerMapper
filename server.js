@@ -13,10 +13,10 @@ app.use(cors());
 app.set('view engine', 'ejs');
 const port = 3000; // Port number
 // app.set('views', __dirname + '/views');
-const viewsPath = new URL('./views', import.meta.url).pathname;
-app.set('views', path.resolve(viewsPath));
-app.use(bodyParser.json({ limit: '10mb' }));
-app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
+// const viewsPath = new URL('./views', import.meta.url).pathname;
+app.set('views', "./views");
+app.use(bodyParser.json({ limit: '20mb' }));
+app.use(bodyParser.urlencoded({ limit: '20mb', extended: true }));
 app.use(express.static('views'));
 
 app.get("/",(req,res)=>{
@@ -37,13 +37,16 @@ app.get('/add', (req, res) => {
 app.post("/add",(req,res)=>{
 
   var data = req.body.data;
-  console.log("data");
-  console.log(data);
   var response = processNetworkData(data);
   res.render("index",{data:response});
 
 
 });
+app.post("/graph",(req,res)=>{
+  var response = req.body;
+  res.render("graph",{data:response.data});
+
+})
 // Start the server
 app.listen(port, (err) => {
     if(err)
@@ -52,3 +55,5 @@ app.listen(port, (err) => {
     }
   console.log(`Server is running on http://localhost:${port}`);
 });
+
+

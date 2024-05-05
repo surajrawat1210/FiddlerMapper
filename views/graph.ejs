@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fiddler Collection Bar Chart</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <canvas id="myChart" width="400" height="400"></canvas>
+    <div id="myData" style="display: none;">
+        <%= JSON.stringify(data) %>
+    </div>
+
+    <script>
+        // Sample Fiddler collection data (replace this with your actual data)
+        const myDataElement = document.getElementById("myData");
+        const fiddlerData = JSON.parse(JSON.parse(myDataElement.textContent));
+
+        // Extract time field from each item
+        const callTimes = fiddlerData.map(item => item.ResponseTime > 10000 ? 5000/1000 : item.ResponseTime/1000);
+
+        // Create a bar chart using Chart.js
+        // const ctx = document.getElementById('myChart').getContext('2d');
+        // const myChart = new Chart(ctx, {
+        //     type: 'bar',
+        //     data: {
+        //         labels: fiddlerData.map(item => item.url),
+        //         datasets: [{
+        //             label: 'Call Time (milliseconds)',
+        //             data: callTimes,
+        //             backgroundColor: 'red',
+        //         }]
+        //     },
+        //     options: {
+        //         scales: {
+        //             y: {
+        //                 beginAtZero: true
+        //             }
+        //         }
+        //     }
+        // });
+        const ctx = document.getElementById('myChart').getContext('2d');
+        let delayed;
+        let width, height, gradient;
+        const myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: fiddlerData.map(item => item.url), // Truncate labels to 15 characters
+                datasets: [{
+                    label: 'Call Time (milliseconds)',
+                    data: callTimes,
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)', // Adjust color as needed
+                    borderColor: function (context) {
+                        const chart = context.chart;
+                        const { ctx, chartArea } = chart;
+
+                        if (!chartArea) {
+                            // This case happens on initial chart load
+                            return;
+                        }
+                        return getGradient(ctx, chartArea);
+                    }, // Adjust color as needed
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                indexAxis: 'x',
+                // Elements options apply to all of the options unless overridden in a dataset
+                // In this case, we are setting the border of each horizontal bar to be 2px wide
+                elements: {
+                    bar: {
+                        borderWidth: 1,
+                    }
+                },
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Call Response Time in milliseconds'
+                    }
+                },
+                animation: {
+                    onComplete: () => {
+                        delayed = true;
+                    },
+                    delay: (context) => {
+                        let delay = 0;
+                        if (context.type === 'data' && context.mode === 'default' && !delayed) {
+                            delay = context.dataIndex * 10 + context.datasetIndex * 10;
+                        }
+                        return delay;
+                    },
+                },
+                scales: {
+                    x: {
+                        stacked: true,
+                        ticks: {
+                            callback: function (value, index, values) {
+                                console.log(value);
+                                return truncateLabel(value, 15); // Truncate label if needed
+                            },
+                            maxRotation: 0,  // Disable rotation
+                            minRotation: 0,  // Disable rotation
+                            align: 'center', // Align labels to the center
+                            font: {
+                                size: 10,      // Adjust font size as needed
+                                weight: 'bold' // Adjust font weight as needed
+                            }
+                        },
+                    },
+                    y: {
+                        stacked: true,
+                        min: 0
+                    },
+                    xAxes: [{
+                gridLines: {
+                    display: false // This will hide vertical lines
+                }
+            }],
+            yAxes: [{
+                gridLines: {
+                    display: false // This will hide horizontal lines
+                }
+            }]
+                }
+
+            }
+        });
+
+        // Function to truncate label
+        function truncateLabel(label, maxLength) {
+            if (label.length > maxLength) {
+                return label.substring(0, maxLength) + '...';
+            } else {
+                return label;
+            }
+        }
+
+        function getGradient(ctx, chartArea) {
+            const chartWidth = chartArea.right - chartArea.left;
+            const chartHeight = chartArea.bottom - chartArea.top;
+            if (!gradient || width !== chartWidth || height !== chartHeight) {
+                // Create the gradient because this is either the first render
+                // or the size of the chart has changed
+                width = chartWidth;
+                height = chartHeight;
+                gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
+                gradient.addColorStop(0, "pink");
+                gradient.addColorStop(1, "yellow");
+                gradient.addColorStop(0.9, "yellow");
+                gradient.addColorStop(0.2, "purple");
+            }
+
+            return gradient;
+        }
+
+    </script>
+</body>
+
+</html>

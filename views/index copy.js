@@ -7,17 +7,20 @@ var Caching = {};
 const IGNORE_VALUES = [null, "abc", "true", "false", true, false];
 const jsonRegex = /^[\s\r\n]*\{.*\}[\s\r\n]*$/;
 const IGNORE_HEADERS = ["host", "user-agent", "accept", "authority", "connection", "accept-language", "content-type", "sec-ch-ua", "sec-ch-ua-bitness", "sec-ch-ua-full-version", "sec-ch-ua-mobile", "sec-ch-ua-model", "sec-ch-ua-platform", "sec-ch-ua-wow64", "sec-fetch-dest", "sec-fetch-site", "connection", "upgrade-insecure-requests",
-    "sec-fetch-mode", "sec-fetch-user", "accept-encoding", "sec-ch-ua-arch", "sec-ch-ua-platform-version", "x-requested-with", "content-encoding",
-    "transfer-encoding", "vary", "date", "server", "cache-control", "expires", "x-frame-options", "x-xss-protection", "x-content-type-options", "access-control-max-age", "access-control-allow-credentials",
-    "access-control-allow-headers", "access-control-expose-headers", "access-control-allow-methods", "x-kong-upstream-latency", "x-kong-proxy-latency", "via", "x-cache","content-length","sec-ch-ua-full-version-list"]; //to add header to ignore 
+ "sec-fetch-mode", "sec-fetch-user", "accept-encoding", "sec-ch-ua-arch", "sec-ch-ua-platform-version", "x-requested-with", "content-encoding",
+"transfer-encoding","vary","date","server","cache-control","expires","x-frame-options","x-xss-protection","x-content-type-options","access-control-max-age","access-control-allow-credentials",
+"access-control-allow-headers","access-control-expose-headers","access-control-allow-methods","x-kong-upstream-latency","x-kong-proxy-latency","via","x-cache"]; //to add header to ignore 
 const IGNORE_RESPONSE_VALUES = ["status", "contenttype"];
 const IGNORE_REQUEST_VALUES = ["httpversion"];
 const IGNORED_HOMEPAGES_REGEX = /^(?!https?:\/\/www\.).*\.com?\/$/i;
-let urlList ={};
 let width;
 let height
 let linkslist;
 let nodelist;
+//   document.addEventListener("DOMContentLoaded", async function() {
+
+// let link;
+// let node;
 let highlight;
 
 
@@ -31,57 +34,18 @@ document.addEventListener("DOMContentLoaded", async function () {
     const nodeObejct = Object.assign([], nodes);
     getD3(linkObject, nodeObejct);
 });
-// document.getElementById("graphjsonInput").addEventListener("click", async function () {
-//     var callName = document.getElementById("call-name").value;
-//     document.getElementById("graphjsonInput").innerText = callName;
-// });
-document.getElementById('graphForm').addEventListener('submit', function(event) {
-            // Prevent the default form submission
-            event.preventDefault();
-            var callName = document.getElementById("myData").innerText;
 
-            // Get the value of the text field
-            const textFieldValue = document.getElementById('graphjsonInput').innerText =callName;
-
-            // // Modify the value of the text field (replace this with your desired modification)
-
-            // // Set the modified value back to the text field
-            // document.getElementById('textField').value = modifiedValue;
-
-            // Submit the form programmatically
-            this.submit();
-        });
 
 document.getElementById("callButton").addEventListener("click", async function () {
 
     clearTable();
     var callName = document.getElementById("call-name").value
-    var filterList = links.filter(link => link.sourcesUrl?.toLowerCase().includes(callName.toLowerCase()));
+    var filterList = links.filter(link => link.sourcesUrl.toLowerCase().includes(callName.toLowerCase()));
     var filterRoutes = nodes.filter(node => filterList.find(link => (link.source == node.id || link.target == node.id)));
     getD3(filterList, filterRoutes);
     filterList.forEach(d => createLinkTable(d));
 
 });
-// document.getElementById("graphButton").addEventListener("click", async function () {
-
-//     clearTable();
-//     var callName = document.getElementById("myData").innerText;
-//     // var filterList = links.filter(link => link.sourcesUrl?.toLowerCase().includes(callName.toLowerCase()));
-//     // var filterRoutes = nodes.filter(node => filterList.find(link => (link.source == node.id || link.target == node.id)));
-//     // getD3(filterList, filterRoutes);
-//     // filterList.forEach(d => createLinkTable(d));
-//     const response = await fetch('/graph', {
-//         method: 'POST',
-//         headers: {
-//             'Content-Type': 'application/json'
-//         },
-//         body: callName
-//     });
-//     const graphHtml = await response.text();
-//     console.log(graphHtml);
-//     document.body.innerHTML = graphHtml; 
-// });
-
 
 function getD3(D3list, D3node) {
     linkslist = D3list.map(obj => deepCopyObject(obj));
@@ -207,10 +171,6 @@ function deepCopyObject(obj) {
 }
 function AddMapping(data) {
     data.forEach((call, index) => {
-        // if(urlList[call]!=undefined)
-        // {
-        //     call.url = call.url
-        // }
         processRequestHeaders(call, index);
         processRequestCookies(call, index);
         processRequestBody(call, index);
@@ -233,9 +193,8 @@ function processResponseHeaders(call, index) {
 function processResponseCookies(call, index) {
     Object.keys(call.ResponseCookie).forEach(key => {
         const value = call.ResponseCookie[key].value;
-        const name = call.ResponseCookie[key].name;
         if ((value !== "" || value !== '') && (!Caching.hasOwnProperty(value) && !IGNORE_VALUES.includes(value))) {
-            Caching[value] = [index, name, "responseCookie", call.url];
+            Caching[value] = [index, key, "responseCookie", call.url];
         }
 
     });
@@ -262,10 +221,12 @@ function processResponseBody(call, index) {
                 }
 
             }
-            else if (call.response.contentType.toLowerCase().includes("text/html")) {
-                try {
-                    var response = call.response[key];
-                    var jsonResponse = htmlToJson(response);
+            else if (call.response.contentType.toLowerCase().includes("text/html"))
+            {
+                try
+                {
+                    var response =call.response[key];
+                    var jsonResponse =htmlToJson(response);
                     var str = flattenObject(jsonResponse);
                     for (const cur in str) {
 
@@ -274,19 +235,10 @@ function processResponseBody(call, index) {
 
                         }
                     }
-                    // var response = call.response[key];
-                    // var jsonResponse = extractTokensAndValuesFromHTML(response);
-                    // var str = flattenObject(jsonResponse);
-                    // for (const cur in str) {
-
-                    //     if (!Caching.hasOwnProperty(str[cur].value) && !IGNORE_VALUES.includes(str[cur].value)) {
-                    //         Caching[str[cur].value] = [index, str[cur].key, "response", call.url];
-
-                    //     }
-                    // }
 
                 }
-                catch (error) {
+                catch(error)
+                {
                     console.log(call.response[key]);
                     console.error(error);
                 }
@@ -322,38 +274,47 @@ function processResponseBody(call, index) {
 
 function processRequestBody(call, index) {
     Object.keys(call.request).forEach(key => {
+        if(call.url.includes("https://www.paypal.com/auth/validatecaptcha"))
+        {
+            // for debugging
+            console.log("helo");
+        }
         if (key == "body" && call.request[key]) {
             if (call.request.contentType && (call.request.contentType.toLowerCase().includes("text/plain") || call.request.contentType.toLowerCase() == "application/x-www-form-urlencoded")) {
                 try {
                     
-                    call.request[key].forEach((item) => {
-
+                    call.request[key].forEach((item)=>{
+                        let value =item.value;
                         if (typeof (item.value) == "string" && item.value.startsWith("Bearer ")) {
                             var valueArray = item.value.split(" ");
-                            findDependency(valueArray[1], "request", item.name, index, call.url);
-                            FindParamsInUrlOfValue(valueArray[1], item.name, index, call);
-                        }
-                        if (jsonRegex.test(item.value)) {
-                            console.log('Valid JSON');
-                            var str = flattenObject(JSON.parse(item.value));
-                            for (const cur in str) {
-                                var strValue = str[cur].value;
-                                if (typeof (str[cur].value) == "string" && str[cur].value.startsWith("Bearer ")) {
-                                    var valueArray = str[cur].value.split(" ");
-                                    strValue = valueArray[1].trim();
+                        
+                            // Test if the string matches the JSON regex
+                            if (jsonRegex.test(valueArray[1])) {
+                                console.log('Valid JSON');
+                                var str  = flattenObject(JSON.parse(valueArray[1]));
+                                for (const cur in str) {
+                                    if (typeof (str[cur].value) == "string" && str[cur].value.startsWith("Bearer ")) {
+                                        var valueArray = str[cur].value.split(" ");
+                                        value = valueArray[1].trim();
+                                    }
+                                    findDependency(str[cur].value, "request", str[cur].key, index, 'call'.url);
+                                    FindParamsInUrlOfValue(str[cur].value, str[cur].key, index, call);
+        
                                 }
-
-                                findDependency(strValue, "request", str[cur].key, index, 'call'.url);
-                                FindParamsInUrlOfValue(strValue, str[cur].key, index, call);
-
                             }
+                            else
+                            {
+                                value = valueArray[1];
+                            }
+                           
                         }
-                        if (!IGNORE_VALUES.includes(item.value)) {
-                            findDependency(item.value, "request", item.name, index, call.url);
-                            FindParamsInUrlOfValue(item.value, item.name, index, call);
-                        }
+                        if( !IGNORE_VALUES.includes(value))
+                        {
+                            findDependency(value, "request", item.name, index, call.url);
+                            FindParamsInUrlOfValue(value, item.name, index, call);
+                        } 
                     });
-
+                
                 }
                 catch (error) {
                     console.log(error);
@@ -364,7 +325,7 @@ function processRequestBody(call, index) {
 
                 try {
                     if (!call.request[key].trim() == "") {
-                        var str = flattenObject(JSON.parse(call.request[key]));
+                        var str = flattenObject(JSON.parse(call.request[key])); //todo need to check this 
                         for (const cur in str) {
                             if (typeof (str[cur].value) == "string" && str[cur].value.startsWith("Bearer ")) {
                                 var valueArray = str[cur].value.split(" ");
@@ -381,11 +342,11 @@ function processRequestBody(call, index) {
                     console.log(call.request[key]);
                     console.log(error);
                 }
+
             }
 
-
             else {
-                console.log("Unexpected Content type " + call.request.contentType);
+                console.log("Unexpected Content type "+ call.request.contentType);
                 console.log(call);
             }
 
@@ -411,11 +372,11 @@ function FindParamsInUrlOfValue(value, key, index, call) {
         url.searchParams.forEach((value, key) => valueList.push({ key: key, value: value }));
     }
     catch {
-        var list = typeof(value) =="string"?value.split("&"):[];
-        if (list.length > 0 && list.includes("&")) {
+        var list = value.split("&");
+        if (list.length > 0) {
             list.forEach(keyValuePairs => {
                 var keyValue = keyValuePairs.split("=");
-                if (keyValue.length == 2 && keyValue[1].trim().length >0 ) {
+                if (keyValue.length == 2) {
                     valueList.push({ key: keyValue[0].trim(), value: keyValue[1].trim() });
                 }
             });
@@ -423,9 +384,12 @@ function FindParamsInUrlOfValue(value, key, index, call) {
     }
     if (valueList.length > 0) {
         valueList.forEach((pair) => {
-            findDependency(pair.value.trim(), "request", key + "@params~" + pair.key.trim(), index, call.url);
-
-        });
+            if(pair.trim()!=="")
+            {
+                            findDependency(pair.value, "request", key + "@params~" + pair.name, index, call.url);
+       
+                     }
+           });
     }
 }
 
@@ -442,10 +406,6 @@ function processRequestCookies(call, index) {
 
 function processRequestHeaders(call, index) {
     Object.keys(call.requestHeader).forEach(key => {
-        if(call.url.includes("https://geo.cardinalcommerce.com/DeviceFingerprintWeb/V2/Browser/SaveBrowserData"))
-        {
-            console.log("hel");
-        }
         if (!IGNORE_HEADERS.includes(key.toLowerCase())) {
             var value = call.requestHeader[key];
             if (typeof (call.requestHeader[key]) == "string" && call.requestHeader[key].startsWith("Bearer ")) {
@@ -453,15 +413,17 @@ function processRequestHeaders(call, index) {
                 value = valueArray[1].trim();
                 findDependency(value, "requestHeader", key, index, call.url);
             }
-            else if (typeof (call.requestHeader[key]) == "string" && (call.requestHeader[key].toLowerCase() == "cookie" || call.requestHeader[key].toLowerCase() == "cookies")) {
-                var keyValuePair = ck.split(";").filter(pr => (!pr.trim().toLowerCase().startsWith("expires") && !pr.trim().toLowerCase().startsWith("path") && !pr.trim().toLowerCase().startsWith("path") && !pr.trim().toLowerCase().startsWith("domain") && !pr.startsWith("version"))).map(pair => pair.split("=")); //todo need to test this 
-                keyValuePair.forEach(([value, key]) => {
+            else if(typeof (call.requestHeader[key]) == "string" && (call.requestHeader[key].toLowerCase() =="cookie" || call.requestHeader[key].toLowerCase()=="cookies"))
+            {
+                var keyValuePair = ck.split(";").filter(pr=>(!pr.trim().toLowerCase().startsWith("expires") && !pr.trim().toLowerCase().startsWith("path") && !pr.trim().toLowerCase().startsWith("path") && !pr.trim().toLowerCase().startsWith("domain") && !pr.startsWith("version"))).map(pair=>pair.split("=")); //todo need to test this 
+                keyValuePair.forEach(([value,key])=>{
                     var valueOfCookie = value.trim();
                     findDependency(valueOfCookie, "requestHeader", key.trim(), index, call.url);
                 });
-
+                
             }
-            else {
+            else
+            {
                 findDependency(value, "requestHeader", key, index, call.url);
             }
         }
@@ -482,25 +444,7 @@ function flattenObject(obj, parentKey = '') {
 function getDataNodes(data) {
     var nodes = [];
     data.forEach((call, index) => {
-
-        //todo this is for repating routes . when we add see repeating routes. we can give that a number
-        // if(call.url.includes("https://www.paypal.com/graphql/"))
-        // {
-        //     console.log("hel");
-        // }
-        // if(urlList[call.url]!=undefined)
-        // {
-        //     urlList[call.url]+=1;
-        //     var urlValue = urlList[call.url];
-        //     nodes.push({ id: index, label: `${call.url}-${urlValue}`, data: call });
-        // }
-        // else
-        // {
-        //     urlList[call.url]=0;   
-        //     nodes.push({ id: index, label: call.url, data: call });
-        // }
         nodes.push({ id: index, label: call.url, data: call });
-        
     });
     return nodes;
 }
@@ -625,8 +569,6 @@ function highlightNode(event, d, node, link) {
 }
 
 function handleLinkClick(event, d) {
-    var edgeData =document.getElementById("edgeData");
-    edgeData.style.display = "none";
     createLinkTable(d);
 }
 
@@ -640,20 +582,18 @@ function createLinkTable(d) {
     const cell1 = row.insertCell();
     const cell2 = row.insertCell();
     const cell3 = row.insertCell();
-    const preElement = document.createElement('pre');
-    
+
     cell1.textContent = d.source?.data?.url ?? d.sourcesUrl;
     cell2.textContent = d.target?.data?.url ?? d.destinationUrl;
-    preElement.textContent = JSON.stringify(d.weight, null, 4);
-    cell3.appendChild(preElement);
-    hljs.highlightElement(preElement);
+    cell3.textContent = JSON.stringify(d.weight, null, 4);
+
     cell1.style.border = '1px solid black';
     cell2.style.border = '1px solid black';
     cell3.style.border = '1px solid black';
 
-    cell1.style.width = '200px';
-    cell2.style.width = '200px';
-    cell3.style.width = '300px';
+    cell1.style.width = '200px'; 
+    cell2.style.width = '200px'; 
+    cell3.style.width = '300px'; 
 
 
     // Set overflow to auto to enable overflow when content exceeds cell dimensions
@@ -671,8 +611,8 @@ function handleMouseOver(event, d) {
     const tooltip = d3.select("#tooltip");
     const jsonData = d.label;
     tooltip.style("visibility", "visible")
-        .style("left", (event.pageX + 3) + "px")
-        .style("top", (event.pageY - 3) + "px")
+        .style("left", (event.pageX +3 ) + "px")
+        .style("top", (event.pageY - 3 ) + "px")
         .html(`${jsonData}`);
 }
 function clearTable() {
@@ -685,40 +625,15 @@ function clearTable() {
 }
 
 function showNodeDetails(node) {
-    var edgeData =document.getElementById("edgeData");
-    edgeData.style.display = "block";
-
-    var additionalData=document.getElementById("additionalData")
-   
-    const preElement = document.createElement('pre');
-    preElement.textContent = JSON.stringify(node.data, null, 4);
-    additionalData.appendChild(preElement);;
-    hljs.highlightElement(preElement);
-}
-
-function isBase64(str) {
-    try {
-        // Attempt to decode the string
-        const decoded = atob(str);
-        // Re-encode and compare to original
-        if (btoa(decoded) === str) {
-            return true;
-        }
-    } catch (error) {
-        // If an error occurs during decoding, it's not Base64
-        return false;
-    }
-    return false;
+    const nodeData = JSON.stringify(node.data, null, 4); 
+    document.getElementById("additionalData").innerText = nodeData;
 }
 
 
-//todo pending items : request header cookies valuee ..  ==> done need to test this 
+//todo pending items : request header cookies valuee ..
 
 //todo if content type is formurlencoded but in param we are passing json so we have to find out the values of those json
 
 
 //todo if a string is base64 convert that into normal string and store that as well. 
 
-//todo need to check if html tag is working or not
-
-//todo check this and fix that        var str = flattenObject(JSON.parse(call.response[key]));

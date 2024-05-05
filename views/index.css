@@ -35,7 +35,7 @@ padding: 14px 20px;
 text-decoration: none;
 }
 .highlighted {
-stroke: rgb(199, 242, 100); /* Change the color to highlight */
+stroke: rgb(78, 79, 75); /* Change the color to highlight */
 stroke-width: 8px;
 }
 .hiddenNodes
@@ -100,7 +100,7 @@ overflow:scroll;
 .highlighted-link {
 stroke-width: 3px;
 stroke-opacity: 1;
-stroke:aquamarine;
+stroke:rgb(101, 103, 102);
 }
 .sidebar {
 /* position: fixed; */
@@ -122,3 +122,53 @@ overflow-y: auto;
     background-color: #f8f9fa; /* Change background color as needed */
     border-left: 1px solid #dee2e6; /* Add border for separation */
 }
+
+/* table {
+    width: 100%;
+    border-collapse: collapse;
+}
+th, td {
+    border: 1px solid black;
+    padding: 8px;
+    text-align: left;
+    vertical-align: top; 
+}
+th, td {
+    width: 33.33%;
+}
+td {
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+} */
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+  }
+
+  th, td {
+    border: 1px solid black;
+    padding: 8px;
+    text-align: left;
+    overflow:scroll;
+    /* white-space: nowrap; */
+    writing-mode: sideways-lr;
+    word-wrap: break-word;
+    vertical-align: top; 
+    text-wrap:pretty;
+    /* text-overflow: ellipsis;  */
+  }
+  .graph-div
+  {
+    height: 200%;
+    background-color: antiquewhite;
+  }
+
+  .navbar-css{
+    margin-left: 40rem;
+    margin-bottom: -20px;
+    background-color: gray;
+    border: grey;
+  }

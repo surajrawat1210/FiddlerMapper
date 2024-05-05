@@ -1,0 +1,10 @@
+{
+  "status": "Declined",
+  "subStatus": "Unknown",
+  "errorCode": "PaymentAccountNumberNotValid",
+  "errorMessage": "PaymentAccountNumberNotValid: PaymentAccountNumberNotValid",
+  "flightBookingResponse": {
+    "status": "Declined",
+    "bookingId": ""
+  }
+}

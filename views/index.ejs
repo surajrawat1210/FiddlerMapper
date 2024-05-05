@@ -9,17 +9,25 @@
     
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://unpkg.com/json-viewer-js/dist/json-viewer.css">
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/styles/default.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/highlight.min.js"></script>
+    <!-- <link rel="stylesheet" href="https://unpkg.com/json-viewer-js/dist/json-viewer.css"> -->
+    <script>hljs.initHighlightingOnLoad();</script>
     <!-- Custom CSS -->
     <link rel="stylesheet" href="/index.css">
 </head>
 <body>
 
-    <!-- Bootstrap Navbar -->
     <div class="navbar">
         <a class="navbar-brand" href="#">Fiddler Call Mapper</a>
-        
+        <div class="graph-data ">
+          <form id="graphForm" class="navbar-css" method="post" action="/graph">
+            <div class="form-group" >
+              <textarea class="form-control" id="graphjsonInput" rows="0" name="data" hidden></textarea>
+              <button type="submit" class="btn btn-primary" id="graphsubmitButton" name ="data" >Response Time Graph</button>
+            </div>
+          </form>
+        </div>
         <div class="search-container">
           <form >
             <input type="text" id ="call-name" placeholder="Search Url ...">
@@ -29,21 +37,21 @@
       </div>
           <div class="container-fluid">
         <div class="row no-gutters">
-            <!-- Graph column (8 columns) -->
-            <div class="col-md-8">
-                <svg id="graph"></svg>
+
+            <div class="col-md-12 graph-div" >
+                <svg id="graph" class="pd-2" style="min-height:150vh;max-height: 200vh;background-color: rgb(80, 80, 80);"></svg>
             </div>
-            <!-- Additional data column (4 columns) -->
-            <div class="col-md-4">
+            
+            <div id ="edgeData" class="col-md-12" style="display: none;">
+              <h1 style="background-color: white;">Node Details</h1>
                 <div id="additionalData">
-                    <!-- Your additional data content goes here -->
                 
                 </div>
             </div>
         </div>
-        <div class="row">
+        <div class="row" >
             <div class="col-md-12">
-                <div class="sidebar" id="sidebar">
+                <div class="sidebar" id="sidebar" style="display: none;">
                     <h2>Edge Details</h2>
                     <table id="edgeDetails">
                       <thead>
@@ -63,15 +71,13 @@
     <div id="tooltip"></div>
     <div id="myData" style="display: none;"> <%= JSON.stringify(data) %> </div>
     
-    <!-- Bootstrap JS, D3.js, and Custom JS -->
-    <!-- Adjust as needed -->
-    <!-- <script src="https://unpkg.com/json-viewer-js/dist/json-viewer.js"></script> -->
-    <script src="node_modules/json-viewer/index.js"></script>
 
+  
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="/htmltojson.js"></script>
     <script src="/index.js"></script>
 </body>
 </html>

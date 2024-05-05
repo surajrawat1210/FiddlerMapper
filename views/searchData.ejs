@@ -21,8 +21,11 @@
             <label for="jsonInput">Enter JSON Data:</label>
             <textarea class="form-control" id="jsonInput" rows="40" name="data" required></textarea>
           </div>
-          <button type="button" class="btn btn-primary" onclick="validateJSON()">Validate JSON</button>
-          <button type="submit" class="btn btn-success" id="submitButton" style="display: none;">Submit JSON</button>
+          <div class="buttons">
+            <button type="button" class="btn btn-primary" onclick="validateJSON()">Validate JSON</button>
+            <button type="submit" class="btn btn-success" id="submitButton" disabled">Submit JSON</button>
+          </div>
+          
         </form>
         <div id="validationResult"></div>
       </div>
@@ -35,10 +38,11 @@ function validateJSON() {
       try {
         JSON.parse(jsonInput);
         document.getElementById('validationResult').innerText = 'Valid JSON';
-        document.getElementById('submitButton').style.display = 'block';
+        // document.getElementById('submitButton').style.display = 'block';
+        document.getElementById('submitButton').disabled = false;
       } catch (error) {
         document.getElementById('validationResult').innerText = 'Invalid JSON: ' + error.message;
-        document.getElementById('submitButton').style.display = 'none';
+        // document.getElementById('submitButton').style.display = 'none';
       }
     }
 </script>
