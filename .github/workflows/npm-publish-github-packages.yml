@@ -22,6 +22,6 @@ jobs:
       - uses: actions/checkout@v3
       - uses: JorgeLNJunior/render-deploy@v1.4.4
         with:
-          service_id: ${{ secrets.RENDER_SERVICE_ID }}
-          api_key: ${{ secrets.RENDER_API_KEY }}
+          service_id: ${{ secrets.FiddlerMapper_ServiceId }}
+          api_key: ${{ secrets.FiddlerMapper_API_KEY }}
     
