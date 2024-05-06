@@ -25,6 +25,6 @@ jobs:
     if: success() && github.ref == 'refs/heads/main'
     steps:
       - name: Trigger Render Deploy Hook
-        run: curl -X POST https://api.render.com/deploy/srv-co7gm26g1b2c73befs5g?key=PWyNK3zZdek
+        run: curl -X POST https://api.render.com/deploy/srv-co7gm26g1b2c73bhfs5g?key=PWyNK3zZdeM
 
     
